@@ -91,7 +91,9 @@ public class XmlHelper {
 			String status = obj.get("status").getAsString();
 			if (status.equalsIgnoreCase("failed")) {
 				suiteFailures++;
+				testCase.setFailure(TestSuites.Failure.create("Test Failed", automationFramework + " Test", "No stack trace available."));
 			}
+			testCase.setStatus(status);
 			testCase.property("status", status);
 			testCase.property("reportURL", obj.get("reportURL").getAsString());
 
@@ -108,6 +110,7 @@ public class XmlHelper {
 		// Apply globals to TestSuite.
 		suite.setTestCases(testCases);
 		suite.setId(suiteName);
+		suite.setName(suiteName);
 		suite.setTime(suiteDuration);
 		suite.setTests(suiteTestCount);
 		suite.setFailures(suiteFailures);

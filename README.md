@@ -4,6 +4,16 @@ This command line interface is designed to extract XCTest and Espresso test exec
 
 Usage
 =
+Either run at the command line:
+
+> com.perfectomobile.Exporter -c=https://wayfair.app.perfectomobile.com -s=[SECURITY TOKEN OBTAINED FROM PERFECTO QUALITY LAB CLOUD] -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB] -x=./TestSuites.xml
+
+Or create an Eclipse run configuration:
+
+![Page One](img/run-configuration-1.jpg)
+
+![Page Two](img/run-configuration-2.jpg)
+
 There are four command line parameters (all required strings):
 * c | perfectoCloudReportingServer
     * Example: -c=https://example.app.perfectomobile.com

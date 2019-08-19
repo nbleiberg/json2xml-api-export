@@ -6,7 +6,7 @@ Usage
 =
 Either run at the command line:
 
-> com.perfectomobile.Exporter -c=https://wayfair.app.perfectomobile.com -s=[SECURITY TOKEN OBTAINED FROM PERFECTO QUALITY LAB CLOUD] -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB] -x=./TestSuites.xml
+> com.perfectomobile.Exporter -c=https://example.app.perfectomobile.com -s=[SECURITY TOKEN OBTAINED FROM PERFECTO QUALITY LAB CLOUD] -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB] -x=./TestSuites.xml
 
 Or create an Eclipse run configuration:
 

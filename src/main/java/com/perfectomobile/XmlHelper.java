@@ -23,7 +23,7 @@ public class XmlHelper {
 		return sw.toString();
 	}
 
-	public static TestSuites convertPerfectoJson(JsonObject executionList) {
+	public static TestSuites convertPerfectoJson(String managementId, JsonObject executionList) {
 		String suiteName = "";
 		Long suiteStartTime = 0L;
 		Long suiteEndTime = 0L;
@@ -32,6 +32,7 @@ public class XmlHelper {
 		String jobNumber = "";
 		String jobBranch = "";
 		int suiteFailures = 0;
+		int suiteErrors = 0;
 		String suiteOwner = "";
 		int suiteTestCount = 0;
 		String automationFramework = "";
@@ -92,6 +93,9 @@ public class XmlHelper {
 			if (status.equalsIgnoreCase("failed")) {
 				suiteFailures++;
 				testCase.setFailure(TestSuites.Failure.create("Test Failed", automationFramework + " Test", "No stack trace available."));
+			} else if (status.equalsIgnoreCase("blocked")) {
+				suiteErrors++;
+				testCase.setError(TestSuites.Error.create("Test Error", automationFramework + " Test", "No stack trace available."));
 			}
 			testCase.setStatus(status);
 			testCase.property("status", status);
@@ -109,7 +113,7 @@ public class XmlHelper {
 
 		// Apply globals to TestSuite.
 		suite.setTestCases(testCases);
-		suite.setId(suiteName);
+		suite.setId(managementId);
 		suite.setName(suiteName);
 		suite.setTime(suiteDuration);
 		suite.setTests(suiteTestCount);
@@ -118,6 +122,8 @@ public class XmlHelper {
 		TestSuites.Properties props = new TestSuites.Properties();
 		props.put("automationFramework", automationFramework);
 		props.put("owner", suiteOwner);
+		props.put("executionid", managementId);
+		props.put("managementid", managementId);
 		props.put("job-name", jobName);
 		props.put("job-number", jobNumber);
 		props.put("job-branch", jobBranch);
@@ -132,6 +138,7 @@ public class XmlHelper {
 		testWrapper.setTests(suiteTestCount);
 		// It doesn't seem that can we count skips for XCTest/Espresso runs.
 		testWrapper.setFailures(suiteFailures);
+		testWrapper.setErrors(suiteErrors);
 		testWrapper.setTestSuites(tests);
 
 		return testWrapper;

@@ -116,7 +116,7 @@ public class Exporter {
 	private static TestSuites convertJson2Xml(JsonObject jsonTests) throws Throwable {
 		System.out.println();
 		System.out.println(consoleTime() + "Converting JSON to XML.");
-		TestSuites tests = XmlHelper.convertPerfectoJson(jsonTests);
+		TestSuites tests = XmlHelper.convertPerfectoJson(_testExecutionId, jsonTests);
 		System.out.println(consoleTime() + "  Test Suite ID: " + tests.getName());
 		System.out.println(consoleTime() + "  Test Count: " + tests.getTests());
 		System.out.println(consoleTime() + "  Test Failures: " + tests.getFailures());

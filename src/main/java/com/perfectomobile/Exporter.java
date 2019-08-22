@@ -25,6 +25,7 @@ public class Exporter {
 	private static String _perfectoSecurityToken = "";
 	private static String _testExecutionId = "";
 	private static String _xmlOutputFilePath = "./TestSuites.xml";
+	private static String _jsonOutputFilePath = "./TestSuites.json";
 	private static Options _options = new Options();
 
 	/**
@@ -37,7 +38,9 @@ public class Exporter {
 		setupCliOptions();
 		applyCommandLineParameters(args);
 		validateConfig();
-		emitXml(convertJson2Xml(callTargetAPI(_perfectoCloudReportingServer, _perfectoSecurityToken)));
+		JsonObject testJson = callTargetAPI(_perfectoCloudReportingServer, _perfectoSecurityToken);
+		emitJsonToFile(testJson);
+		emitXmlToFile(convertJson2Xml(testJson));
 		System.out.println();
 	}
 
@@ -49,6 +52,7 @@ public class Exporter {
 		_options.addOption("e", "testExecutionId", true,
 				"The Execution ID of a set of XCTest or Espresso test results to export. Also called Management ID.");
 		_options.addOption("x", "xmlOutputFilePath", true, "The target file to write Junit XML to.");
+		_options.addOption("j", "jsonOutputFilePath", true, "The target file to write the JSON payload to.");
 	}
 
 	private static void applyCommandLineParameters(String[] args) throws Throwable {
@@ -57,28 +61,24 @@ public class Exporter {
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = parser.parse(_options, args);
 
-		if (cmd.hasOption("c")) {
-			_perfectoCloudReportingServer = cmd.getOptionValue("c");
-			System.out
-					.println(consoleTime() + "  Found perfectoCloudReportingServer: " + _perfectoCloudReportingServer);
-		}
-
-		if (cmd.hasOption("s")) {
-			_perfectoSecurityToken = cmd.getOptionValue("s");
-			System.out.println(consoleTime() + "  Found perfectoSecurityToken: " + _perfectoSecurityToken);
-		}
-
-		if (cmd.hasOption("e")) {
-			_testExecutionId = cmd.getOptionValue("e");
-			System.out.println(consoleTime() + "  Found testExecutionId: " + _testExecutionId);
-		}
-
-		if (cmd.hasOption("x")) {
-			_xmlOutputFilePath = cmd.getOptionValue("x");
-			System.out.println(consoleTime() + "  Found xmlOutputFilePath: " + _xmlOutputFilePath);
-		}
+		_perfectoCloudReportingServer = popOption(cmd, "c");
+		_perfectoSecurityToken = popOption(cmd, "s");
+		_testExecutionId = popOption(cmd, "e");
+		_xmlOutputFilePath = popOption(cmd, "x");
+		_jsonOutputFilePath = popOption(cmd, "j");
 
 		System.out.println(consoleTime() + "Finished parsing command line arguments.");
+	}
+
+	private static String popOption(CommandLine cmd, String option) {
+		String targetMember = "";
+		if (cmd.hasOption(option)) {
+			targetMember = cmd.getOptionValue(option);
+			System.out.println(consoleTime() + "  Found " + option + " :: " + targetMember);
+		} else {
+			System.out.println(consoleTime() + "  Skipped " + option + " :: No value provided.");
+		}
+		return targetMember;
 	}
 
 	private static void validateConfig() throws Throwable {
@@ -124,7 +124,27 @@ public class Exporter {
 		return tests;
 	}
 
-	private static void emitXml(TestSuites xmlTests) throws Throwable {
+	private static void emitJsonToFile(JsonObject testJson) throws Throwable {
+		if(_jsonOutputFilePath.isEmpty()) {
+			return;
+		}
+		System.out.println();
+		System.out.println(consoleTime() + "Writing Json to file.");
+		File f = new File(_jsonOutputFilePath);
+		if (!f.exists()) {
+			System.out.println(consoleTime() + "  Creating file: " + _jsonOutputFilePath);
+			f.createNewFile();
+		}
+
+		OutputStream o = new FileOutputStream(_jsonOutputFilePath);
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		o.write(gson.toJson(testJson).getBytes());
+		o.flush();
+		o.close();
+		System.out.println(consoleTime() + "Finished writing Json to file: " + _jsonOutputFilePath);
+	}
+	
+	private static void emitXmlToFile(TestSuites xmlTests) throws Throwable {
 		System.out.println();
 		System.out.println(consoleTime() + "Writing XML to file.");
 		File f = new File(_xmlOutputFilePath);

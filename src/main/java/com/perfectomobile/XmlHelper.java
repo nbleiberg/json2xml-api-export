@@ -90,16 +90,26 @@ public class XmlHelper {
 			testCase.property("endTime", end.toString());
 			testCase.property("uxDuration", obj.get("uxDuration").getAsString());
 			String status = obj.get("status").getAsString();
+			String reportUrl = obj.get("reportURL").getAsString();
+			JsonElement failure = obj.get("failureReasonName");
+			String failureReason = "";
+			if (failure != null) {
+				failureReason = failure.getAsString();
+			}
 			if (status.equalsIgnoreCase("failed")) {
 				suiteFailures++;
-				testCase.setFailure(TestSuites.Failure.create("Test Failed", automationFramework + " Test", "No stack trace available."));
+				testCase.setFailure(TestSuites.Failure.create(
+						"Test Failed" + (failureReason.isEmpty() ? "" : " : " + failureReason),
+						automationFramework + " Test", "Stack trace available at " + reportUrl));
 			} else if (status.equalsIgnoreCase("blocked")) {
 				suiteErrors++;
-				testCase.setError(TestSuites.Error.create("Test Error", automationFramework + " Test", "No stack trace available."));
+				testCase.setError(
+						TestSuites.Error.create("Test Error" + (failureReason.isEmpty() ? "" : " : " + failureReason),
+								automationFramework + " Test", "Stack trace available at " + reportUrl));
 			}
 			testCase.setStatus(status);
 			testCase.property("status", status);
-			testCase.property("reportURL", obj.get("reportURL").getAsString());
+			testCase.property("reportURL", reportUrl);
 
 			/**
 			 * There's no logical place to append the following to TestCase:

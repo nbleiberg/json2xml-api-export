@@ -65,10 +65,11 @@ public class ApiHelper {
 	private JsonObject fetchTestExecutions(URIBuilder uriBuilder) throws Throwable {
 		URI uri = uriBuilder.build();
 		HttpGet getExecutions = new HttpGet(uri);
-		return getJson(getExecutions);
+		JsonObject executions = getJson(getExecutions);
+		return executions;
 	}
 
-	private void addDefaultRequestHeaders(HttpRequestBase request) {
+    private void addDefaultRequestHeaders(HttpRequestBase request) {
 		if (_securityToken == null || _securityToken.equals("") || _securityToken.length() == 0) {
 			throw new RuntimeException("Invalid security token '" + _securityToken + "'. Please set a security token");
 		}

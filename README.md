@@ -14,7 +14,8 @@ Or create an Eclipse run configuration:
 
 ![Page Two](img/run-configuration-2.jpg)
 
-There are four command line parameters (all required strings):
+Required Arguments
+--
 * c | perfectoCloudReportingServer
     * Example: -c=https://example.app.perfectomobile.com
 * s | perfectoSecurityToken
@@ -23,6 +24,23 @@ There are four command line parameters (all required strings):
     * Example: -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB]
 * x | xmlOutputFilePath
     * Example: -x=./TestSuites.xml
+
+Option Arguments
+--
+* j | jsonOutputFilePath
+    * Example: -j=./TestSuites.json
+* v | verbose
+    * Example: -v
+
+Export Executable Jar
+=
+To create an executable jar in Eclipse, select the File menu | Export. In the export wizard, choose Java > Runnable JAR file. Follow the wizard to select your launch configuration and file path.
+
+![Page One](img/export-page-1.jpg)
+
+![Page Two](img/export-page-2.jpg)
+
+See also [Create runnable jar with Eclipse](http://doduck.com/create-runnable-jar-with-eclipse/index.html).
 
 Reference
 =

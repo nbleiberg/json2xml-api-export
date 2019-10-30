@@ -36,33 +36,45 @@ public class ApiHelper {
 	}
 
 	/**
-	 * Returns executions by Execution ID a.k.a. Management ID, but should work for
-	 * any single tag.
+	 * Returns executions by Execution ID a.k.a. Management ID.
 	 * 
-	 * @param tag
+	 * @param executionId
 	 * @throws Throwable
 	 */
-	public JsonObject retrieveTestExecutions(String tag) throws Throwable {
-		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions");
+	public JsonObject retrieveTestExecutions(String executionId) throws Throwable {
+		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions/");
+		uriBuilder.addParameter("id", executionId);
+		return fetchJson(uriBuilder);
+	}
+
+	public JsonObject retrieveTestExecutionsByTag(String tag) throws Throwable {
+		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions/");
 		uriBuilder.addParameter("tags[0]", tag);
-		return fetchTestExecutions(uriBuilder);
+		return fetchJson(uriBuilder);
 	}
 
 	public JsonObject retrieveTestExecutions(long unixStartTime, long unixEndTime) throws Throwable {
 		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions");
 		uriBuilder.addParameter("startExecutionTime[0]", Long.toString(unixStartTime));
 		uriBuilder.addParameter("endExecutionTime[0]", Long.toString(unixEndTime));
-		return fetchTestExecutions(uriBuilder);
+		return fetchJson(uriBuilder);
 	}
 
 	public JsonObject retrieveTestExecutions(String jobName, String jobNumber) throws Throwable {
 		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions");
 		uriBuilder.addParameter("jobName[0]", jobName);
 		uriBuilder.addParameter("jobNumber[0]", jobNumber);
-		return fetchTestExecutions(uriBuilder);
+		return fetchJson(uriBuilder);
 	}
 
-	private JsonObject fetchTestExecutions(URIBuilder uriBuilder) throws Throwable {
+	public JsonObject retrieveTestCommands(String executionId) throws Throwable {
+		URIBuilder uriBuilder = new URIBuilder(_reportingServerUrl + "/export/api/v1/test-executions/" + executionId + "/commands");
+		JsonObject json = fetchJson(uriBuilder);
+		System.out.println(json);
+		return json;
+	}
+
+	private JsonObject fetchJson(URIBuilder uriBuilder) throws Throwable {
 		URI uri = uriBuilder.build();
 		HttpGet getExecutions = new HttpGet(uri);
 		JsonObject executions = getJson(getExecutions);

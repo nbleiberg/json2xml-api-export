@@ -20,13 +20,17 @@ Required Arguments
     * Example: -c=https://example.app.perfectomobile.com
 * s | perfectoSecurityToken
     * Example: -s=[SECURITY TOKEN OBTAINED FROM PERFECTO QUALITY LAB CLOUD]
-* e | testExecutionId
-    * Example: -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB]
 * x | xmlOutputFilePath
     * Example: -x=./TestSuites.xml
 
-Option Arguments
+Optional Arguments
 --
+* l | list [all executions in the past 24 hours]
+    * Example: -l
+* e | testExecutionId
+    * Example: -e=[GUID REPRESENTING TEST SUITE EXECUTED IN THE PERFECTO QUALITY LAB]
+* t | tag
+    * Example: -t=ExampleTestTag
 * j | jsonOutputFilePath
     * Example: -j=./TestSuites.json
 * v | verbose

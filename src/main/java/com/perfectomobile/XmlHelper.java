@@ -57,14 +57,19 @@ public class XmlHelper {
 			}
 			if (jobName.isEmpty() || jobNumber.isEmpty() || jobBranch.isEmpty()) {
 				JsonObject job = obj.getAsJsonObject("job");
-				if (jobName.isEmpty()) {
-					jobName = job.get("name").getAsString();
-				}
-				if (jobNumber.isEmpty()) {
-					jobNumber = job.get("number").getAsString();
-				}
-				if (jobBranch.isEmpty()) {
-					jobBranch = job.get("branch").getAsString();
+				if (job != null) {
+					JsonElement jn = job.get("name");
+					if (jobName.isEmpty() && jn != null) {
+						jobName = jn.getAsString();
+					}
+					JsonElement jnm = job.get("number");
+					if (jobNumber.isEmpty() && jnm != null) {
+						jobNumber = jnm.getAsString();
+					}
+					JsonElement jb = job.get("branch");
+					if (jobBranch.isEmpty() && jb != null) {
+						jobBranch = jb.getAsString();
+					}
 				}
 			}
 			Long start = Long.parseLong(obj.get("startTime").getAsString());
@@ -81,7 +86,7 @@ public class XmlHelper {
 			// Setup TestCase and append it.
 			String caseName = obj.get("name").getAsString();
 			TestSuites.TestCase testCase = TestSuites.TestCase.create("", caseName, duration);
-			if (suiteName.isEmpty()) {
+			if (suiteName == "" || suiteName.isEmpty()) {
 				suiteName = obj.get("externalId").getAsString();
 			}
 			testCase.setTime(duration);

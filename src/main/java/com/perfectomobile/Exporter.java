@@ -9,6 +9,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import javax.naming.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Pull JSON response from Perfecto Reporting API, transform into Junit XML, and
@@ -28,6 +29,8 @@ public class Exporter {
 	private static String _jsonOutputFilePath = "./TestSuites.json";
 	private static boolean _verbose = false;
 	private static Options _options = new Options();
+	private static boolean _list = false;
+	private static String _tag = "";
 
 	/**
 	 * @param args
@@ -39,6 +42,7 @@ public class Exporter {
 		applyCommandLineParameters(args);
 		validateConfig();
 		JsonObject testJson = callTargetAPI(_perfectoCloudReportingServer, _perfectoSecurityToken);
+		emitJsonList(testJson);
 		emitJsonToFile(testJson);
 		emitXmlToFile(convertJson2Xml(testJson));
 		System.out.println();
@@ -51,10 +55,13 @@ public class Exporter {
 				"The authentication token for access to the Perfecto Reporting API server");
 		_options.addOption("e", "testExecutionId", true,
 				"The Execution ID of a set of XCTest or Espresso test results to export. Also called Management ID.");
+		_options.addOption("t", "tag", true,
+				"A tag that identifies a set of XCTest or Espresso test results to export.");
 		_options.addOption("x", "xmlOutputFilePath", true, "The target file to write Junit XML to.");
 		_options.addOption("j", "jsonOutputFilePath", true, "The target file to write the JSON payload to.");
 		_options.addOption("v", "verbose", false, "Emit additional verbose telemetry to the console.");
 		_options.addOption("h", "help", false, "Output the help documentation to the console.");
+		_options.addOption("l", "list", false, "Emit the JSON for today's test executions to the console.");
 	}
 
 	private static void applyCommandLineParameters(String[] args) throws Throwable {
@@ -71,11 +78,16 @@ public class Exporter {
 			_verbose = true;
 		}
 
+		if (cmd.hasOption("l")) {
+			_list = true;
+		}
+
 		_perfectoCloudReportingServer = popOption(cmd, "c");
 		_perfectoSecurityToken = popOption(cmd, "s");
 		_testExecutionId = popOption(cmd, "e");
 		_xmlOutputFilePath = popOption(cmd, "x");
 		_jsonOutputFilePath = popOption(cmd, "j");
+		_tag = popOption(cmd, "t");
 
 		System.out.println(consoleTime() + "Finished parsing command line arguments.");
 	}
@@ -112,13 +124,13 @@ public class Exporter {
 					"Perfecto Security Token parameter is required to access the Perfecto Cloud Reporting Server.");
 		}
 
-		if (_testExecutionId.isEmpty()) {
+		if (!_list && _testExecutionId.isEmpty() && _tag.isEmpty()) {
 			emitHelp();
 			throw new ConfigurationException(
-					"Execution ID parameter is required to retrieve XCTest or Espresso test execution results.");
+					"Either Execution ID or Tag parameter is required to retrieve XCTest or Espresso test execution results.");
 		}
 
-		if (_xmlOutputFilePath.isEmpty()) {
+		if (!_list && _xmlOutputFilePath.isEmpty()) {
 			emitHelp();
 			throw new ConfigurationException(
 					"The XML Output File Path parameter is required to write the Junit XML output.");
@@ -132,7 +144,21 @@ public class Exporter {
 			System.out.println(consoleTime() + "  reportingServerUrl: " + reportingServerUrl);
 			System.out.println(consoleTime() + "  securityToken: " + securityToken);
 		}
-		JsonObject json = ah.retrieveTestExecutions(_testExecutionId);
+		JsonObject json;
+		if (_list) {
+			if (_verbose) {
+				System.out.println(consoleTime() + "  retrieving list of today's test executions.");
+			}
+			Long start = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);
+			Long end = System.currentTimeMillis();
+			json = ah.retrieveTestExecutions(start, end);
+		} else {
+			if (!_testExecutionId.isEmpty()) {
+				json = ah.retrieveTestExecutions(_testExecutionId);
+			} else {
+				json = ah.retrieveTestExecutionsByTag(_tag);
+			}
+		}
 		System.out.println(consoleTime() + "Finished calling Perfecto Reporting API.");
 		return json;
 	}
@@ -147,6 +173,16 @@ public class Exporter {
 		}
 		System.out.println(consoleTime() + "Finished converting JSON to XML.");
 		return tests;
+	}
+
+	private static void emitJsonList(JsonObject testJson) throws Throwable {
+		if (!_list) {
+			return;
+		}
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		System.out.println();
+		System.out.println(gson.toJson(testJson));
+		System.out.println();
 	}
 
 	private static void emitJsonToFile(JsonObject testJson) throws Throwable {
@@ -170,6 +206,9 @@ public class Exporter {
 	}
 
 	private static void emitXmlToFile(TestSuites xmlTests) throws Throwable {
+		if (_list) {
+			return;
+		}
 		System.out.println(consoleTime() + "Writing XML to file.");
 		File f = new File(_xmlOutputFilePath);
 		if (!f.exists() && _verbose) {

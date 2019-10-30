@@ -18,7 +18,7 @@ import java.net.*;
  * @author davidre@perfectomobile.com
  * 
  *         See public API dox
- *         https://developers.perfectomobile.com/display/PD/DigitalZoom+Reporting+Public+API
+ *         https://developers.perfectomobile.com/display/PD/Smart+Reporting+Public+API
  * 
  *         Borrowed heavily from
  *         https://github.com/PerfectoCode/Reporting-Samples/blob/master/Java/export-api-sample/src/main/java/com/perfecto/reporting/sample/api/ReportiumExportUtils.java

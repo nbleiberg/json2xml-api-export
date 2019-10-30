@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * write to file.
  * 
  * Built for v1 of
- * https://developers.perfectomobile.com/display/PD/DigitalZoom+Reporting+Public+API
+ * https://developers.perfectomobile.com/display/PD/Smart+Reporting+Public+API
  * 
  * @author davidre@perfectomobile.com
  */

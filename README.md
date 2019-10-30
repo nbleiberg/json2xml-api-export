@@ -48,7 +48,7 @@ See also [Create runnable jar with Eclipse](http://doduck.com/create-runnable-ja
 
 Reference
 =
-[Perfecto API documentation](https://developers.perfectomobile.com/display/PD/DigitalZoom+Reporting+Public+API)
+[Perfecto API documentation](https://developers.perfectomobile.com/display/PD/Smart+Reporting+Public+API)
 
 [Junit XML reference](https://llg.cubic.org/docs/junit/)
 
